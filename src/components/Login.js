@@ -3,14 +3,37 @@ import { Container, Button } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
+import { auth, provider, db } from "../firebaseConfig";
+import { signInWithPopup } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 
 export default function Login() {
-
-  const { register, handleSubmit,reset, formState: { errors } } = useForm();
+  const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
   const onSubmit = (data) => {
     console.log("Submitted data:", data);
     reset();
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      // Store user data in Firestore
+      const userRef = doc(db, "users", user.uid);
+      await setDoc(userRef, {
+        name: user.displayName,
+        email: user.email,
+        photoURL: user.photoURL,
+        uid: user.uid,
+        lastLogin: new Date().toISOString(),
+      });
+
+      console.log("Google Sign-In successful and data saved:", user);
+    } catch (error) {
+      console.error("Error with Google Sign-In:", error.message);
+    }
   };
 
   return (
@@ -19,20 +42,20 @@ export default function Login() {
         style={{
           width: "100%",
           maxWidth: "400px",
-          padding: '20px', 
-          border: '1px solid #ced4da', 
-          borderRadius: '8px', 
-          backgroundColor: 'white', 
-          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', 
+          padding: "20px",
+          border: "1px solid #ced4da",
+          borderRadius: "8px",
+          backgroundColor: "white",
+          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
         }}
       >
         <h1
           className="text-center"
           style={{
-            fontSize: '35px', 
-            marginBottom: '30px', 
-            fontWeight: 'bold',
-            color: '#343a40', 
+            fontSize: "35px",
+            marginBottom: "30px",
+            fontWeight: "bold",
+            color: "#343a40",
           }}
         >
           Login
@@ -43,14 +66,14 @@ export default function Login() {
             <Form.Control
               type="email"
               placeholder="Enter email"
-              {...register("email", { 
-                required: "Email is required", 
+              {...register("email", {
+                required: "Email is required",
                 pattern: {
-                  value: /^\S+@\S+$/i, 
-                  message: "Invalid email address"
-                }
-              })} 
-              isInvalid={!!errors.email} 
+                  value: /^\S+@\S+$/i,
+                  message: "Invalid email address",
+                },
+              })}
+              isInvalid={!!errors.email}
             />
           </Form.Group>
 
@@ -59,16 +82,30 @@ export default function Login() {
             <Form.Control
               type="password"
               placeholder="Password"
-              {...register("password", { required: "Password is required" })} 
-              isInvalid={!!errors.password} 
+              {...register("password", { required: "Password is required" })}
+              isInvalid={!!errors.password}
             />
           </Form.Group>
 
-          <Button variant="dark" type="submit" className="w-100" style={{marginTop:'15px' , padding: '10px' }}>
+          <Button
+            variant="dark"
+            type="submit"
+            className="w-100"
+            style={{ marginTop: "15px", padding: "10px" }}
+          >
             Login
           </Button>
 
-          <p style={{ marginTop: '15px', textAlign: 'center' }}>
+          <Button
+            variant="outline-primary"
+            onClick={handleGoogleSignIn}
+            className="w-100 mt-3"
+            style={{ padding: "10px" }}
+          >
+            Sign in with Google
+          </Button>
+
+          <p style={{ marginTop: "15px", textAlign: "center" }}>
             Don't have an account? <Link to="/register">Sign Up</Link>
           </p>
         </Form>
