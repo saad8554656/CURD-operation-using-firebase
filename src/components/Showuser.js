@@ -24,7 +24,7 @@ export default function Showuser() {
 
   return (
     <Container className="my-4">
-      <h1 className="text-center mb-4" style={{ color: '#343a40', fontWeight: 'bold' }}>User Data</h1>
+      <h1 className="text-center mb-4" style={{ color: 'White', fontWeight: 'bold' , borderBottom:"3px solid white" }}>User Data</h1>
       <Table striped bordered hover responsive className="table-container shadow">
         <thead className="table-dark">
           <tr>
@@ -61,7 +61,7 @@ export default function Showuser() {
         </tbody>
       </Table>
       <p className="text-center mt-4">
-                <Link to="/login" className="home-link" style={{ color: '#343a40', textDecoration: 'none', fontWeight: 'bold', fontSize:'50px'  }}>Home
+                <Link to="/login" className="home-link" style={{ color: 'white', textDecoration: 'none', fontWeight: 'bold', fontSize:'50px'  }}>Home
                 </Link>
       </p>
     </Container>
